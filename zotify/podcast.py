@@ -17,10 +17,15 @@ SHOWS_URL = 'https://api.spotify.com/v1/shows'
 
 
 def get_episode_info(episode_id_str) -> Tuple[Optional[str], Optional[str]]:
-    with Loader(PrintChannel.PROGRESS_INFO, "Fetching episode information..."):
-        (raw, info) = Zotify.invoke_url(f'{EPISODE_INFO_URL}/{episode_id_str}')
+# LLzotify
+#    with Loader(PrintChannel.PROGRESS_INFO, "Fetching episode information..."):
+#        (raw, info) = Zotify.invoke_url(f'{EPISODE_INFO_URL}/{episode_id_str}')
+    print("Fetching episode information...")
+    (raw, info) = Zotify.invoke_url(f'{EPISODE_INFO_URL}/{episode_id_str}')
     if not info:
-        Printer.print(PrintChannel.ERRORS, "###   INVALID EPISODE ID   ###")
+# LLzotify
+#        Printer.print(PrintChannel.ERRORS, "###   INVALID EPISODE ID   ###")
+        print("###   INVALID EPISODE ID   ###", flush=True)
     duration_ms = info[DURATION_MS]
     if ERROR in info:
         return None, None
@@ -32,15 +37,24 @@ def get_show_episodes(show_id_str) -> list:
     offset = 0
     limit = 50
 
-    with Loader(PrintChannel.PROGRESS_INFO, "Fetching episodes..."):
-        while True:
-            resp = Zotify.invoke_url_with_params(
-                f'{SHOWS_URL}/{show_id_str}/episodes', limit=limit, offset=offset)
-            offset += limit
-            for episode in resp[ITEMS]:
-                episodes.append(episode[ID])
-            if len(resp[ITEMS]) < limit:
-                break
+# LLzotify
+#    with Loader(PrintChannel.PROGRESS_INFO, "Fetching episodes..."):
+#        while True:
+#            resp = Zotify.invoke_url_with_params(
+#                f'{SHOWS_URL}/{show_id_str}/episodes', limit=limit, offset=offset)
+#            offset += limit
+#            for episode in resp[ITEMS]:
+#                episodes.append(episode[ID])
+#            if len(resp[ITEMS]) < limit:
+#                break
+    while True:
+        resp = Zotify.invoke_url_with_params(
+            f'{SHOWS_URL}/{show_id_str}/episodes', limit=limit, offset=offset)
+        offset += limit
+        for episode in resp[ITEMS]:
+            episodes.append(episode[ID])
+        if len(resp[ITEMS]) < limit:
+            break
 
     return episodes
 
@@ -78,7 +92,9 @@ def download_episode(episode_id) -> None:
     prepare_download_loader.start()
 
     if podcast_name is None:
-        Printer.print(PrintChannel.SKIPS, '###   SKIPPING: (EPISODE NOT FOUND)   ###')
+# LLzotify
+#        Printer.print(PrintChannel.SKIPS, '###   SKIPPING: (EPISODE NOT FOUND)   ###')
+        print('###   SKIPPING: (EPISODE NOT FOUND)   ###')
         prepare_download_loader.stop()
     else:
         filename = podcast_name + ' - ' + episode_name
@@ -104,7 +120,9 @@ def download_episode(episode_id) -> None:
                 and Path(filepath).stat().st_size == total_size
                 and Zotify.CONFIG.get_skip_existing()
             ):
-                Printer.print(PrintChannel.SKIPS, "\n###   SKIPPING: " + podcast_name + " - " + episode_name + " (EPISODE ALREADY EXISTS)   ###")
+# LLzotify
+#                Printer.print(PrintChannel.SKIPS, "\n###   SKIPPING: " + podcast_name + " - " + episode_name + " (EPISODE ALREADY EXISTS)   ###")
+                print("\t\t\t\t\t###   SKIPPING: " + podcast_name + " - " + episode_name + " (EPISODE ALREADY EXISTS)   ###")
                 prepare_download_loader.stop()
                 return
 

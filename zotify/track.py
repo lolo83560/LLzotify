@@ -48,8 +48,10 @@ def get_followed_artists() -> list:
 
 def get_song_info(song_id) -> Tuple[List[str], List[Any], str, str, Any, Any, Any, Any, Any, Any, int]:
     """ Retrieves metadata for downloaded songs """
-    with Loader(PrintChannel.PROGRESS_INFO, "Fetching track information..."):
-        (raw, info) = Zotify.invoke_url(f'{TRACKS_URL}?ids={song_id}&market=from_token')
+# LLzotify
+#    with Loader(PrintChannel.PROGRESS_INFO, "Fetching track information..."):
+#        (raw, info) = Zotify.invoke_url(f'{TRACKS_URL}?ids={song_id}&market=from_token')
+    (raw, info) = Zotify.invoke_url(f'{TRACKS_URL}?ids={song_id}&market=from_token')
 
     if not TRACKS in info:
         raise ValueError(f'Invalid response from TRACKS_URL:\n{raw}')
@@ -85,8 +87,10 @@ def get_song_genres(rawartists: List[str], track_name: str) -> List[str]:
             genres = []
             for data in rawartists:
                 # query artist genres via href, which will be the api url
-                with Loader(PrintChannel.PROGRESS_INFO, "Fetching artist information..."):
-                    (raw, artistInfo) = Zotify.invoke_url(f'{data[HREF]}')
+# LLzotify
+#                with Loader(PrintChannel.PROGRESS_INFO, "Fetching artist information..."):
+#                    (raw, artistInfo) = Zotify.invoke_url(f'{data[HREF]}')
+                (raw, artistInfo) = Zotify.invoke_url(f'{data[HREF]}')
                 if Zotify.CONFIG.get_all_genres() and len(artistInfo[GENRES]) > 0:
                     for genre in artistInfo[GENRES]:
                         genres.append(genre)
@@ -94,7 +98,9 @@ def get_song_genres(rawartists: List[str], track_name: str) -> List[str]:
                     genres.append(artistInfo[GENRES][0])
 
             if len(genres) == 0:
-                Printer.print(PrintChannel.WARNINGS, '###    No Genres found for song ' + track_name)
+# LLzotify
+#                Printer.print(PrintChannel.WARNINGS, '###    No Genres found for song ' + track_name)
+                print('###    No Genres found for song ' + track_name, flush=True)
                 genres.append('')
 
             return genres
@@ -142,14 +148,15 @@ def get_song_duration(song_id: str) -> float:
     return duration
 
 
-def download_track(mode: str, track_id: str, extra_keys=None, disable_progressbar=False) -> None:
+def download_track(mode: str, track_id: str, extra_keys=None, disable_progressbar=True) -> None:
     """ Downloads raw song audio from Spotify """
 
     if extra_keys is None:
         extra_keys = {}
 
-    prepare_download_loader = Loader(PrintChannel.PROGRESS_INFO, "Preparing download...")
-    prepare_download_loader.start()
+# LLzotify
+#    prepare_download_loader = Loader(PrintChannel.PROGRESS_INFO, "Preparing download...")
+#    prepare_download_loader.start()
 
     try:
         output_template = Zotify.CONFIG.get_output(mode)
@@ -194,28 +201,39 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 
             filename = PurePath(filedir).joinpath(f'{fname}_{c}{ext}')
 
+        print('ALBUM: ' + album_name + ' --- SONG: ' + song_name, flush=True)
+    
     except Exception as e:
-        Printer.print(PrintChannel.ERRORS, '###   SKIPPING SONG - FAILED TO QUERY METADATA   ###')
-        Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
-        for k in extra_keys:
-            Printer.print(PrintChannel.ERRORS, k + ': ' + str(extra_keys[k]))
-        Printer.print(PrintChannel.ERRORS, "\n")
-        Printer.print(PrintChannel.ERRORS, str(e) + "\n")
-        Printer.print(PrintChannel.ERRORS, "".join(traceback.TracebackException.from_exception(e).format()) + "\n")
+# LLzotify
+#        Printer.print(PrintChannel.ERRORS, '###   SKIPPING SONG - FAILED TO QUERY METADATA   ###')
+#        Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
+        print('\t\t\t\t\tSkipped (FAILED TO QUERY METADATA)   ###')
+# LLzotify
+#        for k in extra_keys:
+#            Printer.print(PrintChannel.ERRORS, k + ': ' + str(extra_keys[k]))
+#        Printer.print(PrintChannel.ERRORS, "\n")
+#        Printer.print(PrintChannel.ERRORS, str(e) + "\n")
+#        Printer.print(PrintChannel.ERRORS, "".join(traceback.TracebackException.from_exception(e).format()) + "\n")
 
     else:
         try:
             if not is_playable:
-                prepare_download_loader.stop()
-                Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG IS UNAVAILABLE)   ###' + "\n")
+# LLzotify
+#                prepare_download_loader.stop()
+#                Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG IS UNAVAILABLE)   ###' + "\n")
+                print('\t\t\t\t\t...Skipped (SONG IS UNAVAILABLE)   ###')
             else:
                 if check_id and check_name and Zotify.CONFIG.get_skip_existing():
-                    prepare_download_loader.stop()
-                    Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY EXISTS)   ###' + "\n")
+# LLzotify
+#                    prepare_download_loader.stop()
+#                    Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY EXISTS)   ###' + "\n")
+                    print('\t\t\t\t\t...Skipped (SONG ALREADY EXISTS)   ###')
 
                 elif check_all_time and Zotify.CONFIG.get_skip_previously_downloaded():
-                    prepare_download_loader.stop()
-                    Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY DOWNLOADED ONCE)   ###' + "\n")
+# LLzotify
+#                    prepare_download_loader.stop()
+#                    Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY DOWNLOADED ONCE)   ###' + "\n")
+                    print('\t\t\t\t\t...Skipped (SONG ALREADY DOWNLOADED ONCE)   ###')
 
                 else:
                     if track_id != scraped_song_id:
@@ -225,30 +243,37 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     create_download_directory(filedir)
                     total_size = stream.input_stream.size
 
-                    prepare_download_loader.stop()
+# LLzotify
+#                    prepare_download_loader.stop()
 
                     time_start = time.time()
                     downloaded = 0
-                    with open(filename_temp, 'wb') as file, Printer.progress(
-                            desc=song_name,
-                            total=total_size,
-                            unit='B',
-                            unit_scale=True,
-                            unit_divisor=1024,
-                            disable=disable_progressbar
-                    ) as p_bar:
+# LLzotify
+#                    with open(filename_temp, 'wb') as file, Printer.progress(
+#                            desc=song_name,
+#                            total=total_size,
+#                            unit='B',
+#                            unit_scale=True,
+#                            unit_divisor=1024,
+#                            disable=disable_progressbar
+#                    ) as p_bar:
+                    with open(filename_temp, 'wb') as file:
                         b = 0
                         while b < 5:
                         #for _ in range(int(total_size / Zotify.CONFIG.get_chunk_size()) + 2):
                             data = stream.input_stream.stream().read(Zotify.CONFIG.get_chunk_size())
-                            p_bar.update(file.write(data))
+#                            p_bar.update(file.write(data))
+                            file.write(data)
                             downloaded += len(data)
                             b += 1 if data == b'' else 0
                             if Zotify.CONFIG.get_download_real_time():
                                 delta_real = time.time() - time_start
                                 delta_want = (downloaded / total_size) * (duration_ms/1000)
                                 if delta_want > delta_real:
-                                    time.sleep(delta_want - delta_real)
+# LLzotify
+#                                    time.sleep(delta_want - delta_real)
+# idea from https://github.com/zotify-dev/zotify/issues/186
+                                    time.sleep(5)
 
                     time_downloaded = time.time()
 
@@ -258,20 +283,26 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                         try:
                             get_song_lyrics(track_id, PurePath(str(filename)[:-3] + "lrc"))
                         except ValueError:
-                            Printer.print(PrintChannel.SKIPS, f"###   Skipping lyrics for {song_name}: lyrics not available   ###")
+# LLzotify
+#                            Printer.print(PrintChannel.SKIPS, f"###   Skipping lyrics for {song_name}: lyrics not available   ###")
+                            print("\t###   Skipping lyrics for {song_name}: lyrics not available   ###", flush=True)
                     convert_audio_format(filename_temp)
                     try:
                         set_audio_tags(filename_temp, artists, genres, name, album_name, release_year, disc_number, track_number)
                         set_music_thumbnail(filename_temp, image_url)
                     except Exception:
-                        Printer.print(PrintChannel.ERRORS, "Unable to write metadata, ensure ffmpeg is installed and added to your PATH.")
+# LLzotify
+#                        Printer.print(PrintChannel.ERRORS, "Unable to write metadata, ensure ffmpeg is installed and added to your PATH.")
+                        print("\t### Unable to write metadata, ensure ffmpeg is installed and added to your PATH.", flush=True)
 
                     if filename_temp != filename:
                         Path(filename_temp).rename(filename)
 
                     time_finished = time.time()
 
-                    Printer.print(PrintChannel.DOWNLOADS, f'###   Downloaded "{song_name}" to "{Path(filename).relative_to(Zotify.CONFIG.get_root_path())}" in {fmt_seconds(time_downloaded - time_start)} (plus {fmt_seconds(time_finished - time_downloaded)} converting)   ###' + "\n")
+# LLzotify
+#                    Printer.print(PrintChannel.DOWNLOADS, f'###   Downloaded "{song_name}" to "{Path(filename).relative_to(Zotify.CONFIG.get_root_path())}" in {fmt_seconds(time_downloaded - time_start)} (plus {fmt_seconds(time_finished - time_downloaded)} converting)   ###' + "\n")
+                    print('\t\t\t\t\t <<<Downloaded>>>', flush=True)
 
                     # add song id to archive file
                     if Zotify.CONFIG.get_skip_previously_downloaded():
@@ -283,17 +314,21 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     if Zotify.CONFIG.get_bulk_wait_time():
                         time.sleep(Zotify.CONFIG.get_bulk_wait_time())
         except Exception as e:
-            Printer.print(PrintChannel.ERRORS, '###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
-            Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
-            for k in extra_keys:
-                Printer.print(PrintChannel.ERRORS, k + ': ' + str(extra_keys[k]))
-            Printer.print(PrintChannel.ERRORS, "\n")
-            Printer.print(PrintChannel.ERRORS, str(e) + "\n")
-            Printer.print(PrintChannel.ERRORS, "".join(traceback.TracebackException.from_exception(e).format()) + "\n")
+# LLzotify
+#            Printer.print(PrintChannel.ERRORS, '###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
+#            Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
+            print('\t\t\t\t\t###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
+# LLzotify
+    #        for k in extra_keys:
+#   #             Printer.print(PrintChannel.ERRORS, k + ': ' + str(extra_keys[k]))
+    #        Printer.print(PrintChannel.ERRORS, "\n")
+#   #        Printer.print(PrintChannel.ERRORS, str(e) + "\n")
+#   #        Printer.print(PrintChannel.ERRORS, "".join(traceback.TracebackException.from_exception(e).format()) + "\n")
             if Path(filename_temp).exists():
                 Path(filename_temp).unlink()
 
-    prepare_download_loader.stop()
+# LLzotify
+#    prepare_download_loader.stop()
 
 
 def convert_audio_format(filename) -> None:
@@ -325,11 +360,15 @@ def convert_audio_format(filename) -> None:
             inputs={temp_filename: None},
             outputs={filename: output_params}
         )
-        with Loader(PrintChannel.PROGRESS_INFO, "Converting file..."):
-            ff_m.run()
+# LLzotify
+#        with Loader(PrintChannel.PROGRESS_INFO, "Converting file..."):
+#            ff_m.run()
+        ff_m.run()
 
         if Path(temp_filename).exists():
             Path(temp_filename).unlink()
 
     except ffmpy.FFExecutableNotFoundError:
-        Printer.print(PrintChannel.WARNINGS, f'###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')
+# LLzotify
+#        Printer.print(PrintChannel.WARNINGS, f'###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')
+        print('\t###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')
