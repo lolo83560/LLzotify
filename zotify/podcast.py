@@ -17,13 +17,13 @@ SHOWS_URL = 'https://api.spotify.com/v1/shows'
 
 
 def get_episode_info(episode_id_str) -> Tuple[Optional[str], Optional[str]]:
-# LLzotify
+# LLzotify streamlined
 #    with Loader(PrintChannel.PROGRESS_INFO, "Fetching episode information..."):
 #        (raw, info) = Zotify.invoke_url(f'{EPISODE_INFO_URL}/{episode_id_str}')
     print("Fetching episode information...")
     (raw, info) = Zotify.invoke_url(f'{EPISODE_INFO_URL}/{episode_id_str}')
     if not info:
-# LLzotify
+# LLzotify streamlined
 #        Printer.print(PrintChannel.ERRORS, "###   INVALID EPISODE ID   ###")
         print("###   INVALID EPISODE ID   ###", flush=True)
     duration_ms = info[DURATION_MS]
@@ -37,7 +37,7 @@ def get_show_episodes(show_id_str) -> list:
     offset = 0
     limit = 50
 
-# LLzotify
+# LLzotify streamlined
 #    with Loader(PrintChannel.PROGRESS_INFO, "Fetching episodes..."):
 #        while True:
 #            resp = Zotify.invoke_url_with_params(
@@ -92,7 +92,7 @@ def download_episode(episode_id) -> None:
     prepare_download_loader.start()
 
     if podcast_name is None:
-# LLzotify
+# LLzotify streamlined
 #        Printer.print(PrintChannel.SKIPS, '###   SKIPPING: (EPISODE NOT FOUND)   ###')
         print('###   SKIPPING: (EPISODE NOT FOUND)   ###')
         prepare_download_loader.stop()
@@ -120,7 +120,7 @@ def download_episode(episode_id) -> None:
                 and Path(filepath).stat().st_size == total_size
                 and Zotify.CONFIG.get_skip_existing()
             ):
-# LLzotify
+# LLzotify streamlined
 #                Printer.print(PrintChannel.SKIPS, "\n###   SKIPPING: " + podcast_name + " - " + episode_name + " (EPISODE ALREADY EXISTS)   ###")
                 print("\t\t\t\t\t###   SKIPPING: " + podcast_name + " - " + episode_name + " (EPISODE ALREADY EXISTS)   ###")
                 prepare_download_loader.stop()

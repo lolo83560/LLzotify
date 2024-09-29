@@ -48,7 +48,7 @@ def get_followed_artists() -> list:
 
 def get_song_info(song_id) -> Tuple[List[str], List[Any], str, str, Any, Any, Any, Any, Any, Any, int]:
     """ Retrieves metadata for downloaded songs """
-# LLzotify
+# LLzotify streamlined
 #    with Loader(PrintChannel.PROGRESS_INFO, "Fetching track information..."):
 #        (raw, info) = Zotify.invoke_url(f'{TRACKS_URL}?ids={song_id}&market=from_token')
     (raw, info) = Zotify.invoke_url(f'{TRACKS_URL}?ids={song_id}&market=from_token')
@@ -87,7 +87,7 @@ def get_song_genres(rawartists: List[str], track_name: str) -> List[str]:
             genres = []
             for data in rawartists:
                 # query artist genres via href, which will be the api url
-# LLzotify
+# LLzotify streamlined
 #                with Loader(PrintChannel.PROGRESS_INFO, "Fetching artist information..."):
 #                    (raw, artistInfo) = Zotify.invoke_url(f'{data[HREF]}')
                 (raw, artistInfo) = Zotify.invoke_url(f'{data[HREF]}')
@@ -98,7 +98,7 @@ def get_song_genres(rawartists: List[str], track_name: str) -> List[str]:
                     genres.append(artistInfo[GENRES][0])
 
             if len(genres) == 0:
-# LLzotify
+# LLzotify streamlined
 #                Printer.print(PrintChannel.WARNINGS, '###    No Genres found for song ' + track_name)
                 print('###    No Genres found for song ' + track_name, flush=True)
                 genres.append('')
@@ -151,10 +151,15 @@ def get_song_duration(song_id: str) -> float:
 def download_track(mode: str, track_id: str, extra_keys=None, disable_progressbar=True) -> None:
     """ Downloads raw song audio from Spotify """
 
+# LLzotify
+# systematically wait 1 sec before each action, helps reducing the key error
+
+    time.sleep(1)
+
     if extra_keys is None:
         extra_keys = {}
 
-# LLzotify
+# LLzotify streamlined
 #    prepare_download_loader = Loader(PrintChannel.PROGRESS_INFO, "Preparing download...")
 #    prepare_download_loader.start()
 
@@ -204,11 +209,11 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
         print('ALBUM: ' + album_name + ' --- SONG: ' + song_name, flush=True)
     
     except Exception as e:
-# LLzotify
+# LLzotify streamlined
 #        Printer.print(PrintChannel.ERRORS, '###   SKIPPING SONG - FAILED TO QUERY METADATA   ###')
 #        Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
         print('\t\t\t\t\tSkipped (FAILED TO QUERY METADATA)   ###')
-# LLzotify
+# LLzotify streamlined
 #        for k in extra_keys:
 #            Printer.print(PrintChannel.ERRORS, k + ': ' + str(extra_keys[k]))
 #        Printer.print(PrintChannel.ERRORS, "\n")
@@ -218,24 +223,25 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
     else:
         try:
             if not is_playable:
-# LLzotify
+# LLzotify streamlined
 #                prepare_download_loader.stop()
 #                Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG IS UNAVAILABLE)   ###' + "\n")
                 print('\t\t\t\t\t...Skipped (SONG IS UNAVAILABLE)   ###')
             else:
                 if check_id and check_name and Zotify.CONFIG.get_skip_existing():
-# LLzotify
+# LLzotify streamlined
 #                    prepare_download_loader.stop()
 #                    Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY EXISTS)   ###' + "\n")
                     print('\t\t\t\t\t...Skipped (SONG ALREADY EXISTS)   ###')
 
                 elif check_all_time and Zotify.CONFIG.get_skip_previously_downloaded():
-# LLzotify
+# LLzotify streamlined
 #                    prepare_download_loader.stop()
 #                    Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY DOWNLOADED ONCE)   ###' + "\n")
                     print('\t\t\t\t\t...Skipped (SONG ALREADY DOWNLOADED ONCE)   ###')
 
                 else:
+                   
                     if track_id != scraped_song_id:
                         track_id = scraped_song_id
                     track = TrackId.from_base62(track_id)
@@ -243,12 +249,12 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     create_download_directory(filedir)
                     total_size = stream.input_stream.size
 
-# LLzotify
+# LLzotify streamlined
 #                    prepare_download_loader.stop()
 
                     time_start = time.time()
                     downloaded = 0
-# LLzotify
+# LLzotify streamlined
 #                    with open(filename_temp, 'wb') as file, Printer.progress(
 #                            desc=song_name,
 #                            total=total_size,
@@ -262,6 +268,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                         while b < 5:
                         #for _ in range(int(total_size / Zotify.CONFIG.get_chunk_size()) + 2):
                             data = stream.input_stream.stream().read(Zotify.CONFIG.get_chunk_size())
+# LLzotify streamlined
 #                            p_bar.update(file.write(data))
                             file.write(data)
                             downloaded += len(data)
@@ -270,10 +277,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                                 delta_real = time.time() - time_start
                                 delta_want = (downloaded / total_size) * (duration_ms/1000)
                                 if delta_want > delta_real:
-# LLzotify
-#                                    time.sleep(delta_want - delta_real)
-# idea from https://github.com/zotify-dev/zotify/issues/186
-                                    time.sleep(5)
+                                    time.sleep(delta_want - delta_real)
 
                     time_downloaded = time.time()
 
@@ -283,7 +287,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                         try:
                             get_song_lyrics(track_id, PurePath(str(filename)[:-3] + "lrc"))
                         except ValueError:
-# LLzotify
+# LLzotify streamlined
 #                            Printer.print(PrintChannel.SKIPS, f"###   Skipping lyrics for {song_name}: lyrics not available   ###")
                             print("\t###   Skipping lyrics for {song_name}: lyrics not available   ###", flush=True)
                     convert_audio_format(filename_temp)
@@ -291,7 +295,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                         set_audio_tags(filename_temp, artists, genres, name, album_name, release_year, disc_number, track_number)
                         set_music_thumbnail(filename_temp, image_url)
                     except Exception:
-# LLzotify
+# LLzotify streamlined
 #                        Printer.print(PrintChannel.ERRORS, "Unable to write metadata, ensure ffmpeg is installed and added to your PATH.")
                         print("\t### Unable to write metadata, ensure ffmpeg is installed and added to your PATH.", flush=True)
 
@@ -300,10 +304,11 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 
                     time_finished = time.time()
 
-# LLzotify
+# LLzotify streamlined and make it more visual that a download succeded
 #                    Printer.print(PrintChannel.DOWNLOADS, f'###   Downloaded "{song_name}" to "{Path(filename).relative_to(Zotify.CONFIG.get_root_path())}" in {fmt_seconds(time_downloaded - time_start)} (plus {fmt_seconds(time_finished - time_downloaded)} converting)   ###' + "\n")
-                    print('\t\t\t\t\t <<<Downloaded>>>', flush=True)
-
+                    print('                              +++------------+##############################################################', flush=True)
+                    print('----------------------------- ++| DOWNLOADED |##############################################################', flush=True)
+                    print('                              +++------------+##############################################################', flush=True)
                     # add song id to archive file
                     if Zotify.CONFIG.get_skip_previously_downloaded():
                         add_to_archive(scraped_song_id, PurePath(filename).name, artists[0], name)
@@ -314,11 +319,11 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     if Zotify.CONFIG.get_bulk_wait_time():
                         time.sleep(Zotify.CONFIG.get_bulk_wait_time())
         except Exception as e:
-# LLzotify
+# LLzotify streamlined
 #            Printer.print(PrintChannel.ERRORS, '###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
 #            Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
             print('\t\t\t\t\t###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
-# LLzotify
+# LLzotify streamlined
     #        for k in extra_keys:
 #   #             Printer.print(PrintChannel.ERRORS, k + ': ' + str(extra_keys[k]))
     #        Printer.print(PrintChannel.ERRORS, "\n")
@@ -327,7 +332,7 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
             if Path(filename_temp).exists():
                 Path(filename_temp).unlink()
 
-# LLzotify
+# LLzotify streamlined
 #    prepare_download_loader.stop()
 
 
@@ -360,7 +365,7 @@ def convert_audio_format(filename) -> None:
             inputs={temp_filename: None},
             outputs={filename: output_params}
         )
-# LLzotify
+# LLzotify streamlined
 #        with Loader(PrintChannel.PROGRESS_INFO, "Converting file..."):
 #            ff_m.run()
         ff_m.run()
@@ -369,6 +374,6 @@ def convert_audio_format(filename) -> None:
             Path(temp_filename).unlink()
 
     except ffmpy.FFExecutableNotFoundError:
-# LLzotify
+# LLzotify streamlined
 #        Printer.print(PrintChannel.WARNINGS, f'###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')
         print('\t###   SKIPPING {file_codec.upper()} CONVERSION - FFMPEG NOT FOUND   ###')

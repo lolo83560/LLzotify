@@ -20,7 +20,7 @@ def client(args) -> None:
     """ Connects to download server to perform query's and get songs to download """
     Zotify(args)
 
-# LLzotify
+# LLzotify streamlined
 #    Printer.print(PrintChannel.SPLASH, splash())
 
     quality_options = {
@@ -41,7 +41,7 @@ def client(args) -> None:
             download_from_urls(urls)
 
         else:
-# LLzotify
+# LLzotify streamlined streamlined
 #            Printer.print(PrintChannel.ERRORS, f'File {filename} not found.\n')
             print('File {filename} not found.\n', flush=True)
         return
@@ -58,7 +58,7 @@ def client(args) -> None:
     if args.liked_songs:
         for song in get_saved_tracks():
             if not song[TRACK][NAME] or not song[TRACK][ID]:
-# LLzotify
+# LLzotify streamlined
 #                Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
                 print('\t\t\t\t\t###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###', flush=True)
             else:
@@ -111,7 +111,7 @@ def download_from_urls(urls: list[str]) -> bool:
             char_num = len(str(len(playlist_songs)))
             for song in playlist_songs:
                 if not song[TRACK][NAME] or not song[TRACK][ID]:
-# LLzotify
+# LLzotify streamlined
 #                    Printer.print(PrintChannel.SKIPS, '###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###' + "\n")
                     print('\t\t\t\t\t###   SKIPPING:  SONG DOES NOT EXIST ANYMORE   ###', flush=True)
                 else:
