@@ -1,8 +1,6 @@
 Modded version with simple text outputs to facilitate integration in a Powershell script call
 
-Associated PS wrapper to be installed from here :
-
-pip install git+https://github.com/lolo83560/ZotifyDownload.git
+Associated PS wrapper to be installed from here : https://github.com/lolo83560/ZotifyDownload.git
 
 ============================================================================================
 
