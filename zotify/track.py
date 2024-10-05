@@ -151,11 +151,6 @@ def get_song_duration(song_id: str) -> float:
 def download_track(mode: str, track_id: str, extra_keys=None, disable_progressbar=True) -> None:
     """ Downloads raw song audio from Spotify """
 
-# LLzotify
-# systematically wait 1 sec before each action, helps reducing the key error
-
-    time.sleep(1)
-
     if extra_keys is None:
         extra_keys = {}
 
