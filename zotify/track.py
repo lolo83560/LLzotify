@@ -147,9 +147,15 @@ def get_song_duration(song_id: str) -> float:
 
     return duration
 
+# LLzotify
+# implemente a counter of successive "general error" to abort zotify after n successive (speeding up the global retry called by PS)
+G_successiveErrors = 0
 
 def download_track(mode: str, track_id: str, extra_keys=None, disable_progressbar=True) -> None:
     """ Downloads raw song audio from Spotify """
+
+# LLzotify
+    global G_successiveErrors
 
     if extra_keys is None:
         extra_keys = {}
@@ -222,18 +228,24 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 #                prepare_download_loader.stop()
 #                Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG IS UNAVAILABLE)   ###' + "\n")
                 print('\t\t\t\t\t...Skipped (SONG IS UNAVAILABLE)   ###')
+# LLzotify
+                G_successiveErrors = 0 
             else:
                 if check_id and check_name and Zotify.CONFIG.get_skip_existing():
 # LLzotify streamlined
 #                    prepare_download_loader.stop()
 #                    Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY EXISTS)   ###' + "\n")
                     print('\t\t\t\t\t...Skipped (SONG ALREADY EXISTS)   ###')
+# LLzotify
+                    G_successiveErrors = 0 
 
                 elif check_all_time and Zotify.CONFIG.get_skip_previously_downloaded():
 # LLzotify streamlined
 #                    prepare_download_loader.stop()
 #                    Printer.print(PrintChannel.SKIPS, '\n###   SKIPPING: ' + song_name + ' (SONG ALREADY DOWNLOADED ONCE)   ###' + "\n")
                     print('\t\t\t\t\t...Skipped (SONG ALREADY DOWNLOADED ONCE)   ###')
+# LLzotify
+                    G_successiveErrors = 0 
 
                 else:
                    
@@ -304,6 +316,10 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
                     print('                              +++------------+##############################################################', flush=True)
                     print('----------------------------- ++| DOWNLOADED |##############################################################', flush=True)
                     print('                              +++------------+##############################################################', flush=True)
+
+# LLzotify
+                    G_successiveErrors = 0 
+
                     # add song id to archive file
                     if Zotify.CONFIG.get_skip_previously_downloaded():
                         add_to_archive(scraped_song_id, PurePath(filename).name, artists[0], name)
@@ -319,6 +335,16 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 #            Printer.print(PrintChannel.ERRORS, 'Track_ID: ' + str(track_id))
             print('\t\t\t\t\t###   SKIPPING: ' + song_name + ' (GENERAL DOWNLOAD ERROR)   ###')
 
+# LLzotify
+            G_successiveErrors += 1
+            if G_successiveErrors == 10:
+                print('<\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/>', flush=True)
+                print('<                                                  >', flush=True)
+                print('>   TOO MANY SUCCESSIVE ERRORS - ABORTING ZOTIFY   >', flush=True)
+                print('<                                                  >', flush=True)
+                print('<\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/>', flush=True)
+                quit()
+                
 # LLzotify streamlined
     #        for k in extra_keys:
 #   #             Printer.print(PrintChannel.ERRORS, k + ': ' + str(extra_keys[k]))
