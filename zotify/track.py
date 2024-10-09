@@ -338,11 +338,27 @@ def download_track(mode: str, track_id: str, extra_keys=None, disable_progressba
 # LLzotify
             G_successiveErrors += 1
             if G_successiveErrors == 10:
-                print('<\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/>', flush=True)
-                print('<                                                  >', flush=True)
-                print('>   TOO MANY SUCCESSIVE ERRORS - ABORTING ZOTIFY   >', flush=True)
-                print('<                                                  >', flush=True)
-                print('<\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/>', flush=True)
+                
+                print ('                       :::!~!!!!!:.                                            ', flush=True)
+                print ('                  .xUHWH!! !!?M88WHX:.                                         ', flush=True)
+                print ('                .X*#M@$!!  !X!M$$$$$$WWx:.                                     ', flush=True)
+                print ('               :!!!!!!?H! :!$!$$$$$$$$$$8X:                                    ', flush=True)
+                print ('              !!~  ~:~!! :~!$!#$$$$$$$$$$8X:                                   ', flush=True)
+                print ('             :!~::!H!<   ~.U$X!?R$$$$$$$$MM!                                   ', flush=True)
+                print ('             ~!~!!!!~~ .:XW$$$U!!?$$$$$$RMM!                                   ', flush=True)
+                print ('               !:~~~ .:!M"T#$$$$WX??#MRRMMM!       TOO MANY SUCCESSIVE ERRORS  ', flush=True)
+                print ('               ~?WuxiW*`   `"#$$$$8!!!!??!!!                                   ', flush=True)
+                print ('             :X- M$$$$       `"T#$T~!8$WUXU~            ABORTING ZOTIFY        ', flush=True)
+                print ('            :%`  ~#$$$m:        ~!~ ?$$$$$$                                    ', flush=True)
+                print ('          :!`.-   ~T$$$$8xx.  .xWW- ~""##*"                                    ', flush=True)
+                print ('.....   -~~:<` !    ~?T#$$@@W@*?$$      /`                                     ', flush=True)
+                print ('W$@@M!!! .!~~ !!     .:XUW$W!~ `"~:    :                                       ', flush=True)
+                print ('#"~~`.:x%`!!  !H:   !WM$$$$Ti.: .!WUn+!`                                       ', flush=True)
+                print (':::~:!!`:X~ .: ?H.!u "$$$B$$$!W:U!T$$M~                                        ', flush=True)
+                print ('.~~   :X@!.-~   ?@WTWo("*$$$W$TH$! `                                           ', flush=True)
+                print ('Wi.~!X$?!-~    : ?$$$B$Wu("**$RM!                                              ', flush=True)
+                print ('$R@i.~~ !     :   ~$$$$$B$$en:``                                               ', flush=True)
+                print ('?MXT@Wx.~    :     ~"##*$$$$M~                                                 ', flush=True)
                 quit()
                 
 # LLzotify streamlined
